@@ -12,6 +12,8 @@ app.use('/api/users',usersRoutes)
 
 app.use((req,res,next)=>{
     const error=new HttpError('Could not find this route .',404)
+
+
     throw error
 
 });
@@ -27,4 +29,4 @@ app.use((error, req, res, next) => {
 app.get("/")
 mongoose.connect("mongodb+srv://sandhya:123@cluster0.zk5li.mongodb.net/places?retryWrites=true&w=majority&appName=Cluster0").then(app.listen(5000, () => {
     console.log("server is running at 5000")
-})).catch()
+})).catch(err=>console.log(err))
