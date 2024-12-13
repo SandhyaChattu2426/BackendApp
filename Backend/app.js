@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const placesRoutes = require('./routes/places-routes')
 const HttpError=require("./models/http-error")
 const usersRoutes=require("./routes/users-routes")
+const mongoose=require("mongoose")
 app.use(bodyParser.json())
 
 app.use('/api/places', placesRoutes);
@@ -24,7 +25,6 @@ app.use((error, req, res, next) => {
 })
 
 app.get("/")
-
-app.listen(5000, () => {
+mongoose.connect("mongodb+srv://sandhya:123@cluster0.zk5li.mongodb.net/places?retryWrites=true&w=majority&appName=Cluster0").then(app.listen(5000, () => {
     console.log("server is running at 5000")
-})
+})).catch()
