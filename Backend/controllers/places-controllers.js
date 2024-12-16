@@ -3,6 +3,8 @@ const HttpError = require('../models/http-error')
 const { v4: uuid } = require("uuid")
 const { validationResult } = require('express-validator')
 const Place = require('../models/place')
+const User=require('../models/user')
+const { default: mongoose } = require('mongoose')
 
 
 let DUMMY_PLACES = [{
@@ -91,14 +93,31 @@ const createPlace = async (req, res, next) => {
         creator,
     });
 
-    //DUMMY_PLACES.push(createPlace)
-    try {
-        await createdPlace.save()
+    let user;
+    try{
+        user=await User.fingById(creator);
     }
-    //console.log(createPlace)
-    catch {
+    // console.log(createdPlace)
+    catch(e){
+        const error=new HttpError("creaing place failed,please try again",500)
+        return next(error);
+    }
+    if(!user){
+        const error=new HttpError("User NotLogged in",500)
+        return next(error);
+    }
+    console.log(user);
+    try {
+        const sess=await mongoose.startSession();
+        sess.startTransaction();
+        await createdPlace.save({session:sess});
+        user.places.push(createdPlace);
+        await user.save({session:sess});
+        await sess.commitTransaction();
+    }
+    catch(err) {
         const error = new HttpError("Can not created Place please check inputFields", 500)
-        console.log(error)
+        console.log(err)
         return next(error)
     }
     res.status(201)
